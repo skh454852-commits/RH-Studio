@@ -1,0 +1,6 @@
+{
+  "name": "PulseStream",
+  "description": "All-in-one social media platform for photo, video, music & audio sharing, comments, and creator monetization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

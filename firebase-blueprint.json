@@ -1,0 +1,485 @@
+{
+  "entities": {
+    "AdminMarker": {
+      "title": "AdminMarker",
+      "description": "Marker document indicating administrator privileges for a user UID.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Global platform configuration for creator monetization, AdMob test/prod unit IDs, and safety thresholds.",
+      "type": "object",
+      "properties": {
+        "minFollowersForMonetization": { "type": "integer" },
+        "minPostsForMonetization": { "type": "integer" },
+        "minViewsForMonetization": { "type": "integer" },
+        "creatorRevenueSharePercent": { "type": "integer" },
+        "minWithdrawalUsd": { "type": "number" },
+        "adMobAppId": { "type": "string" },
+        "bannerAdUnitId": { "type": "string" },
+        "nativeAdUnitId": { "type": "string" },
+        "rewardedAdUnitId": { "type": "string" },
+        "adsEnabled": { "type": "boolean" },
+        "autoModerationEnabled": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "minFollowersForMonetization",
+        "minPostsForMonetization",
+        "minViewsForMonetization",
+        "creatorRevenueSharePercent",
+        "minWithdrawalUsd",
+        "adsEnabled",
+        "autoModerationEnabled",
+        "updatedAt"
+      ]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public-safe creator profile without PII.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "displayName": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatarBase64": { "type": "string" },
+        "coverBase64": { "type": "string" },
+        "followersCount": { "type": "integer" },
+        "followingCount": { "type": "integer" },
+        "postsCount": { "type": "integer" },
+        "verified": { "type": "boolean" },
+        "monetizationStatus": {
+          "type": "string",
+          "enum": ["not_applied", "pending", "approved", "rejected", "suspended"]
+        },
+        "accountStatus": {
+          "type": "string",
+          "enum": ["active", "suspended"]
+        },
+        "privateProfile": { "type": "boolean" },
+        "allowDms": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId",
+        "username",
+        "displayName",
+        "followersCount",
+        "followingCount",
+        "postsCount",
+        "verified",
+        "monetizationStatus",
+        "accountStatus",
+        "privateProfile",
+        "allowDms",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserPrivateSettings": {
+      "title": "UserPrivateSettings",
+      "description": "Owner-only PII and payout preferences isolated from public profile.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "payoutProvider": { "type": "string", "enum": ["none", "bank_transfer", "upi"] },
+        "maskedPayoutDestination": { "type": "string" },
+        "notifyLikes": { "type": "boolean" },
+        "notifyComments": { "type": "boolean" },
+        "notifyFollows": { "type": "boolean" },
+        "notifyEarnings": { "type": "boolean" },
+        "themeMode": { "type": "string", "enum": ["system", "light", "dark"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId",
+        "payoutProvider",
+        "notifyLikes",
+        "notifyComments",
+        "notifyFollows",
+        "notifyEarnings",
+        "themeMode",
+        "updatedAt"
+      ]
+    },
+    "FollowEdge": {
+      "title": "FollowEdge",
+      "description": "Follow relationship document keyed by follower or target UID.",
+      "type": "object",
+      "properties": {
+        "actorId": { "type": "string" },
+        "targetId": { "type": "string" },
+        "actorName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["actorId", "targetId", "createdAt"]
+    },
+    "SavedPostEdge": {
+      "title": "SavedPostEdge",
+      "description": "Bookmark reference to a saved post or audio track.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "postId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "postId", "createdAt"]
+    },
+    "BlockedUserEdge": {
+      "title": "BlockedUserEdge",
+      "description": "Blocked or muted user entry.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "blockedUserId": { "type": "string" },
+        "blockedUsername": { "type": "string" },
+        "muteOnly": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "blockedUserId", "muteOnly", "createdAt"]
+    },
+    "NotificationItem": {
+      "title": "NotificationItem",
+      "description": "In-app social and monetization notification.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "actorId": { "type": "string" },
+        "actorName": { "type": "string" },
+        "type": { "type": "string", "enum": ["like", "comment", "follow", "monetization", "payout", "system"] },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "targetPostId": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "actorId", "actorName", "type", "title", "body", "read", "createdAt"]
+    },
+    "Playlist": {
+      "title": "Playlist",
+      "description": "Personal music and audio playlist owned by a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "trackIds": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "trackIds", "createdAt", "updatedAt"]
+    },
+    "SocialPost": {
+      "title": "SocialPost",
+      "description": "Social post supporting photo, video, music, and recorded audio.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorUsername": { "type": "string" },
+        "authorAvatarBase64": { "type": "string" },
+        "mediaType": { "type": "string", "enum": ["photo", "video", "music", "audio"] },
+        "title": { "type": "string" },
+        "caption": { "type": "string" },
+        "hashtags": { "type": "array" },
+        "location": { "type": "string" },
+        "mediaPreviewBase64": { "type": "string" },
+        "localMediaPath": { "type": "string" },
+        "mimeType": { "type": "string" },
+        "durationSeconds": { "type": "integer" },
+        "trimStartMs": { "type": "integer" },
+        "trimEndMs": { "type": "integer" },
+        "chunkCount": { "type": "integer" },
+        "copyrightConfirmed": { "type": "boolean" },
+        "likesCount": { "type": "integer" },
+        "commentsCount": { "type": "integer" },
+        "viewsCount": { "type": "integer" },
+        "status": { "type": "string", "enum": ["active", "removed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "authorId",
+        "authorName",
+        "authorUsername",
+        "mediaType",
+        "caption",
+        "hashtags",
+        "copyrightConfirmed",
+        "likesCount",
+        "commentsCount",
+        "viewsCount",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MediaChunk": {
+      "title": "MediaChunk",
+      "description": "Chunked Base64 media payload for cross-device photo/audio rendering.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "chunkIndex": { "type": "integer" },
+        "data": { "type": "string" }
+      },
+      "required": ["authorId", "chunkIndex", "data"]
+    },
+    "PostLike": {
+      "title": "PostLike",
+      "description": "Per-user like marker on a post.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "PostComment": {
+      "title": "PostComment",
+      "description": "Comment or reply on a social post.",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorUsername": { "type": "string" },
+        "text": { "type": "string" },
+        "parentCommentId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["postId", "authorId", "authorName", "authorUsername", "text", "createdAt", "updatedAt"]
+    },
+    "StoryItem": {
+      "title": "StoryItem",
+      "description": "Short-lived creator story highlight.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorAvatarBase64": { "type": "string" },
+        "caption": { "type": "string" },
+        "imageBase64": { "type": "string" },
+        "accentHex": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "authorName", "caption", "accentHex", "createdAt"]
+    },
+    "CreatorApplication": {
+      "title": "CreatorApplication",
+      "description": "Application submitted by a user for ad revenue sharing eligibility.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "category": { "type": "string" },
+        "notes": { "type": "string" },
+        "followersSnapshot": { "type": "integer" },
+        "viewsSnapshot": { "type": "integer" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "adminNote": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "username", "category", "followersSnapshot", "viewsSnapshot", "status", "createdAt", "updatedAt"]
+    },
+    "CreatorEarnings": {
+      "title": "CreatorEarnings",
+      "description": "Verified creator monetization balances and ad revenue totals.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "eligibleViews": { "type": "integer" },
+        "estimatedRevenueUsd": { "type": "number" },
+        "monthlyEarningsUsd": { "type": "number" },
+        "availableBalanceUsd": { "type": "number" },
+        "pendingBalanceUsd": { "type": "number" },
+        "totalWithdrawnUsd": { "type": "number" },
+        "monetizationStatus": { "type": "string", "enum": ["not_applied", "pending", "approved", "rejected", "suspended"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId",
+        "eligibleViews",
+        "estimatedRevenueUsd",
+        "monthlyEarningsUsd",
+        "availableBalanceUsd",
+        "pendingBalanceUsd",
+        "totalWithdrawnUsd",
+        "monetizationStatus",
+        "updatedAt"
+      ]
+    },
+    "LedgerTransaction": {
+      "title": "LedgerTransaction",
+      "description": "Financial ledger item for verified ad revenue or withdrawal activity.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["ad_revenue", "withdrawal", "adjustment"] },
+        "amountUsd": { "type": "number" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["completed", "pending", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "amountUsd", "description", "status", "createdAt"]
+    },
+    "WithdrawalRequest": {
+      "title": "WithdrawalRequest",
+      "description": "Creator payout request reviewed by administrators.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "amountUsd": { "type": "number" },
+        "payoutProvider": { "type": "string", "enum": ["bank_transfer", "upi"] },
+        "maskedDestination": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "paid", "rejected"] },
+        "adminNote": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "username", "amountUsd", "payoutProvider", "maskedDestination", "status", "createdAt", "updatedAt"]
+    },
+    "ContentReport": {
+      "title": "ContentReport",
+      "description": "User report for inappropriate content, spam, copyright violation, or app issues.",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string" },
+        "targetType": { "type": "string", "enum": ["post", "comment", "user", "copyright", "app_issue"] },
+        "targetId": { "type": "string" },
+        "reason": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "resolved", "dismissed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterId", "targetType", "targetId", "reason", "status", "createdAt", "updatedAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Direct messaging thread between two users.",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "array" },
+        "participantNames": { "type": "object" },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantIds", "lastMessage", "updatedAt"]
+    },
+    "DirectMessage": {
+      "title": "DirectMessage",
+      "description": "Individual message inside a conversation with denormalized participantIds.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "participantIds": { "type": "array" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["conversationId", "senderId", "participantIds", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminMarker" },
+      "description": "Admin role marker documents."
+    },
+    "/admin_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/AdminSettings" },
+      "description": "Global platform configuration and monetization rules."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Public-safe user profiles."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateSettings" },
+      "description": "Owner-only private preferences and masked payout config."
+    },
+    "/users/{userId}/followers/{followerId}": {
+      "schema": { "$ref": "#/entities/FollowEdge" },
+      "description": "Followers of a user."
+    },
+    "/users/{userId}/following/{targetId}": {
+      "schema": { "$ref": "#/entities/FollowEdge" },
+      "description": "Creators followed by a user."
+    },
+    "/users/{userId}/saved_posts/{postId}": {
+      "schema": { "$ref": "#/entities/SavedPostEdge" },
+      "description": "Saved/bookmarked posts."
+    },
+    "/users/{userId}/blocked/{blockedId}": {
+      "schema": { "$ref": "#/entities/BlockedUserEdge" },
+      "description": "Blocked or muted users."
+    },
+    "/users/{userId}/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/NotificationItem" },
+      "description": "User notification inbox."
+    },
+    "/users/{userId}/playlists/{playlistId}": {
+      "schema": { "$ref": "#/entities/Playlist" },
+      "description": "Personal audio playlists."
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/SocialPost" },
+      "description": "Photo, video, music, and audio posts."
+    },
+    "/posts/{postId}/media/{chunkId}": {
+      "schema": { "$ref": "#/entities/MediaChunk" },
+      "description": "Chunked media payload slices for cross-device viewing."
+    },
+    "/posts/{postId}/likes/{userId}": {
+      "schema": { "$ref": "#/entities/PostLike" },
+      "description": "Per-user post likes."
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/PostComment" },
+      "description": "Post comments and replies."
+    },
+    "/stories/{storyId}": {
+      "schema": { "$ref": "#/entities/StoryItem" },
+      "description": "Creator stories."
+    },
+    "/creator_applications/{userId}": {
+      "schema": { "$ref": "#/entities/CreatorApplication" },
+      "description": "Monetization applications."
+    },
+    "/creator_earnings/{userId}": {
+      "schema": { "$ref": "#/entities/CreatorEarnings" },
+      "description": "Verified creator monetization balances."
+    },
+    "/transactions/{txId}": {
+      "schema": { "$ref": "#/entities/LedgerTransaction" },
+      "description": "Earnings and withdrawal ledger."
+    },
+    "/withdrawal_requests/{reqId}": {
+      "schema": { "$ref": "#/entities/WithdrawalRequest" },
+      "description": "Creator payout requests."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/ContentReport" },
+      "description": "Content, copyright, and support reports."
+    },
+    "/conversations/{convId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "1:1 direct message conversations."
+    },
+    "/conversations/{convId}/messages/{msgId}": {
+      "schema": { "$ref": "#/entities/DirectMessage" },
+      "description": "Direct messages inside a conversation."
+    }
+  }
+}
